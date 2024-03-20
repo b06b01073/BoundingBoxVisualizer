@@ -1,6 +1,6 @@
 # Demo
 
-![](./asset/bbox.gif)
+[![Demo video]](./asset/camera_0.mp4)
 
 # Folder structure
 ```

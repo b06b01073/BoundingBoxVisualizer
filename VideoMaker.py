@@ -65,7 +65,7 @@ class VideoMaker:
                     cv2.rectangle(image, (x1, y1), (x2, y2), color, 2) # add bounding box
 
 
-                    cv2.putText(image, text=str(box[4]), org=(x1, y1 - 5), fontFace=cv2.FONT_HERSHEY_SIMPLEX, fontScale=0.5, color=color, thickness=1) # add id text
+                    cv2.putText(image, text=str(box[4]), org=(x1, y1 - 5), fontFace=cv2.FONT_HERSHEY_SIMPLEX, fontScale=2, color=color, thickness=3) # add id text
 
                 text = f'Camera {camera}'
 
@@ -79,7 +79,7 @@ class VideoMaker:
                 # Calculate the position of the text
                 text_x = image.shape[1] - text_size[0] - 10  # 10 pixels padding from the right edge
                 text_y = image.shape[0] - 120  # 10 pixels padding from the bottom edge
-                cv2.putText(image, text, (text_x, text_y), font, font_scale, (255, 255, 255), thickness=1)
+                cv2.putText(image, text, (text_x, text_y), font, font_scale, (255, 255, 255), thickness=3)
                 out.write(image)
 
 
