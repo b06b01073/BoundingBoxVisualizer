@@ -15,8 +15,11 @@ if __name__ == '__main__':
         print(f'{args.image_dir} does not exist.')
         exit()
 
-    if not os.path.exists(args.label_dir):
+    if args.label_dir is None:
+        print(f'Making videos without bounding boxes...')
+    elif not os.path.exists(args.label_dir):
         print(f'{args.label_dir} does not exist.')
+        exit() 
 
     if not os.path.exists(args.save_dir):
         os.makedirs(args.save_dir)

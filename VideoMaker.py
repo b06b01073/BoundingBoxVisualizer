@@ -13,7 +13,7 @@ class VideoMaker:
         return file_name.split('_')[0]
     
 
-    def build_camerawise_data(self, image_dir, label_dir):
+    def build_camerawise_image(self, image_dir):
 
         image_list = os.listdir(image_dir)
         image_dict = defaultdict(list)
@@ -24,7 +24,10 @@ class VideoMaker:
         for value in image_dict.values():
             value.sort()
 
+        return image_dict
 
+    
+    def build_camerawise_label(self, label_dir):
         label_list = os.listdir(label_dir)
         label_dict = defaultdict(list)
         for label in label_list:
@@ -34,21 +37,54 @@ class VideoMaker:
         for value in label_dict.values():
             value.sort()
 
-        return image_dict, label_dict
+        return label_dict
 
 
-    def make(self, image_dir, label_dir, save_path):
-        image_dict, label_dict = self.build_camerawise_data(image_dir, label_dir)
-        self.make_video(image_dict, label_dict, save_path)
+    def make(self, image_dir, label_dir, save_dir):
+        image_dict = self.build_camerawise_image(image_dir)
         
-        
+        if label_dir is None:
+            self.make_video_without_label(image_dict, save_dir)
+        else:
+            label_dict = self.build_camerawise_label(label_dir)
+            self.make_video_with_label(image_dict, label_dict, save_dir)
 
-    def make_video(self, image_dict, label_dict, save_dir):
+
+    def make_video_without_label(self, image_dict, save_dir):
         camera_set = image_dict.keys()
         
         for camera in tqdm(camera_set, dynamic_ncols=True, desc='processing camera'):
             fourcc = cv2.VideoWriter_fourcc(*'mp4v')  # Use 'mp4v' for MP4 format
-            out = cv2.VideoWriter(os.path.join(save_dir, f'camera_{camera}.mp4'), fourcc, 2, (1280, 720))
+            out = cv2.VideoWriter(os.path.join(save_dir, f'camera_{camera}.mp4'), fourcc, 1, (1280, 720))
+
+            for image in image_dict[camera]:
+                image = cv2.imread(image)
+
+                text = f'Camera {camera}'
+
+                # Define the font and scale
+                font = cv2.FONT_HERSHEY_SIMPLEX
+                font_scale = 1
+
+                # Get the size of the text
+                text_size = cv2.getTextSize(text, font, font_scale, thickness=1)[0]
+
+                # Calculate the position of the text
+                text_x = image.shape[1] - text_size[0] - 10  # 10 pixels padding from the right edge
+                text_y = image.shape[0] - 120  # 10 pixels padding from the bottom edge
+                cv2.putText(image, text, (text_x, text_y), font, font_scale, (255, 255, 255), thickness=3)
+                out.write(image)
+
+
+            out.release()
+
+
+    def make_video_with_label(self, image_dict, label_dict, save_dir):
+        camera_set = image_dict.keys()
+        
+        for camera in tqdm(camera_set, dynamic_ncols=True, desc='processing camera'):
+            fourcc = cv2.VideoWriter_fourcc(*'mp4v')  # Use 'mp4v' for MP4 format
+            out = cv2.VideoWriter(os.path.join(save_dir, f'camera_{camera}.mp4'), fourcc, 1, (1280, 720))
 
             for label, image in zip(label_dict[camera], image_dict[camera]):
                 image = cv2.imread(image)
@@ -86,7 +122,6 @@ class VideoMaker:
             out.release()
 
 
-
     def cv2_bbox_adaptor(self, height, width, box):
         center_x = width * box[0]
         adjusted_width = width * box[2] / 2
@@ -116,6 +151,7 @@ class VideoMaker:
 class Palette:
     def __init__(self):     
         self.colors = {}
+
 
     def get_color(self, id):
         if not id in self.colors:

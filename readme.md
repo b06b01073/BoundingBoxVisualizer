@@ -44,7 +44,12 @@ Install the packages in `requirements.txt` first.
 
 ```
 # Example: 
+
 # This will read the images from train/images/0902_150000_151900/ and the labels from train/labels/0902_150000_151900/
 # The result will be stored in video directory.
 $ python makeVideo.py -i=train/images/0902_150000_151900/ -l=train/labels/0902_150000_151900/ -s=video
+
+
+# You can also make the vidoes without bounding boxes by omitting the -l argument
+$ python makeVideo.py -i=train/images/0902_150000_151900/ -s=video 
 ```
